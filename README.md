@@ -83,5 +83,8 @@ The Soroban smart contract is deployed on Testnet at:
 ---
 
 ## 📸 Screenshots & Explorations
-1. **Wallet Selection Modal**: Choose Freighter, xBull, Albedo, or Lobstr.
-2. **On-Chain Process Monitor**: Detailed execution breakdown with real-time status updates and live explorer transaction hash lookups.
+1. **Wallet Selection Modal**:
+   ![Wallet Selection Modal](./image-4.png)
+
+2. **On-Chain Process Monitor**:
+   ![On-Chain Process Monitor](./image-5.png)
