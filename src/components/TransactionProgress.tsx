@@ -1,5 +1,37 @@
 import React from 'react';
-import { ExternalLink, CheckCircle, XCircle, Clock, Loader2, AlertCircle } from 'lucide-react';
+import { ExternalLink, CheckCircle, XCircle, Clock, Loader2, AlertCircle, Copy, Check } from 'lucide-react';
+
+const CopyHashButton: React.FC<{ hash: string }> = ({ hash }) => {
+  const [copied, setCopied] = React.useState(false);
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(hash);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <button
+      onClick={handleCopy}
+      className="btn btn-secondary"
+      style={{ 
+        padding: '0.2rem 0.4rem', 
+        fontSize: '0.75rem', 
+        display: 'inline-flex', 
+        alignItems: 'center', 
+        justifyContent: 'center',
+        marginLeft: '0.5rem',
+        height: '1.5rem',
+        minWidth: '1.5rem',
+        verticalAlign: 'middle',
+        cursor: 'pointer'
+      }}
+      title="Copy Transaction Hash"
+    >
+      {copied ? <Check size={10} style={{ color: '#10b981' }} /> : <Copy size={10} />}
+    </button>
+  );
+};
 
 export interface PaymentStatus {
   recipient: string;
@@ -153,16 +185,19 @@ export const TransactionProgress: React.FC<TransactionProgressProps> = ({
                 </td>
                 <td>
                   {payment.status === 'success' && payment.txHash && (
-                    <a
-                      href={`https://stellar.expert/explorer/testnet/tx/${payment.txHash}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="link-explorer"
-                      style={{ fontSize: '0.85rem' }}
-                    >
-                      <span>Explorer</span>
-                      <ExternalLink size={12} />
-                    </a>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                      <a
+                        href={`https://stellar.expert/explorer/testnet/tx/${payment.txHash}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="link-explorer"
+                        style={{ fontSize: '0.85rem' }}
+                      >
+                        <span>Explorer</span>
+                        <ExternalLink size={12} />
+                      </a>
+                      <CopyHashButton hash={payment.txHash} />
+                    </div>
                   )}
                   {payment.status === 'failed' && payment.error && (
                     <div style={{ color: 'var(--error)', fontSize: '0.8rem', maxWidth: '180px', wordBreak: 'break-word', lineHeight: '1.2' }}>
