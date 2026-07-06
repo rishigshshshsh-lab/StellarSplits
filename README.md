@@ -81,8 +81,14 @@ The Soroban smart contract is deployed on Testnet at:
 - **Transaction Hash**: [`5d188c3aa7470a09a9801219b5238eba5d7b75aad05507faad4672bf7b756ba52`](https://stellar.expert/explorer/testnet/tx/5d188c3aa7470a09a9801219b5238eba5d7b75aad05507faad4672bf7b756ba52)
 
 ### Verifiable Payment Receipts:
-- **Receipt 1 (Payment 1)**: [`c11c8400251c22e71db69071924186e99aa30b7843a4c1e92994c5a367acd84c`](https://stellar.expert/explorer/testnet/tx/c11c8400251c22e71db69071924186e99aa30b7843a4c1e92994c5a367acd84c)
-- **Receipt 2 (Payment 2)**: [`d714ea3ed3a8b1b1ae8ca1bb68e75e7b5970c09d5aca615745bf37159c08e8fa`](https://stellar.expert/explorer/testnet/tx/d714ea3ed3a8b1b1ae8ca1bb68e75e7b5970c09d5aca615745bf37159c08e8fa)
+
+#### 👤 Recipient #1 (GCHVOUED...70P5CBI4)
+- **XLM Payment Transaction**: [`7228556f0472167d14b8a25dca01bef56e2d17f92022060ea76d9f9a8e2da052`](https://stellar.expert/explorer/testnet/tx/7228556f0472167d14b8a25dca01bef56e2d17f92022060ea76d9f9a8e2da052)
+- **On-Chain Registry Update (`mark_paid`)**: [`40c0dd9f2d5632c3b30b5e285b02f209f49f2d9ee84437739694f3ce3d3a6220`](https://stellar.expert/explorer/testnet/tx/40c0dd9f2d5632c3b30b5e285b02f209f49f2d9ee84437739694f3ce3d3a6220)
+
+#### 👤 Recipient #2 (GBB35PEW...0BAFT22K)
+- **XLM Payment Transaction**: [`174bc6cff0c469fc5b88524d5997cc529a5fc4adc544c710ce7e586ebe61f3a2`](https://stellar.expert/explorer/testnet/tx/174bc6cff0c469fc5b88524d5997cc529a5fc4adc544c710ce7e586ebe61f3a2)
+- **On-Chain Registry Update (`mark_paid`)**: [`5e641d408f99197f5b2eefee23fe7260251eef472cb95b018e35f3e22cf32f04`](https://stellar.expert/explorer/testnet/tx/5e641d408f99197f5b2eefee23fe7260251eef472cb95b018e35f3e22cf32f04)
 
 ---
 
@@ -90,8 +96,11 @@ The Soroban smart contract is deployed on Testnet at:
 1. **Wallet Selection Modal**:
    ![Wallet Selection Modal](./image-4.png)
 
-2. **On-Chain Process Monitor**:
+2. **On-Chain Process Monitor (Freighter Popup)**:
    ![On-Chain Process Monitor](./image-5.png)
 
 3. **Stellar.expert Contract Call Verification**:
    ![Stellar.expert Contract Call Verification](./image-6.png)
+
+4. **Successful On-Chain Bill Splitting Process Complete**:
+   ![Successful On-Chain Bill Splitting Process Complete](./image-7.png)
