@@ -121,6 +121,17 @@ Verifies UI stability and react state logic in `src/tests/split.test.tsx`:
 
 ---
 
+## 🔗 Verifiable Transactions
+
+### Verifiable Contract Call:
+- **Transaction Hash**: [`5d188c3aa7470a09a9801219b5238eba5d7b75aad05507faad4672bf7b756ba52`](https://stellar.expert/explorer/testnet/tx/5d188c3aa7470a09a9801219b5238eba5d7b75aad05507faad4672bf7b756ba52)
+
+### Verifiable Payment Receipts:
+- **Receipt 1 (Payment 1)**: [`c11c8400251c22e71db69071924186e99aa30b7843a4c1e92994c5a367acd84c`](https://stellar.expert/explorer/testnet/tx/c11c8400251c22e71db69071924186e99aa30b7843a4c1e92994c5a367acd84c)
+- **Receipt 2 (Payment 2)**: [`d714ea3ed3a8b1b1ae8ca1bb68e75e7b5970c09d5aca615745bf37159c08e8fa`](https://stellar.expert/explorer/testnet/tx/d714ea3ed3a8b1b1ae8ca1bb68e75e7b5970c09d5aca615745bf37159c08e8fa)
+
+---
+
 ## 🌐 Live Demo & Screencast
 
 - **Live Deployed Frontend**: [StellarSplit Live](https://stellarsplit-orange.vercel.app)
@@ -138,3 +149,16 @@ Verifies UI stability and react state logic in `src/tests/split.test.tsx`:
 
 3. **cargo test Output (7 contract tests passing)**:
    ![cargo test output](./image-3.png)
+
+4. **Wallet Selection Modal**:
+   ![Wallet Selection Modal](./image-4.png)
+
+5. **On-Chain Process Monitor**:
+   ![On-Chain Process Monitor](./image-5.png)
+
+6. **Successful On-Chain Bill Splitting Process Complete**:
+   ![Successful On-Chain Bill Splitting Process Complete](./image-7.png)
+
+7. **Stellar.expert Contract Call Verification**:
+   ![Stellar.expert Contract Call Verification](./image-6.png)
+
