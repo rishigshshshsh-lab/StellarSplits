@@ -10,7 +10,7 @@ pub struct MockNotifier;
 
 #[contractimpl]
 impl MockNotifier {
-    pub fn notify_completed(env: Env, bill_id: String) {
+    pub fn notify_completed(env: Env, bill_id: String, creator: Address) {
         let key = Symbol::new(&env, "completed");
         env.storage().persistent().set(&key, &true);
     }
@@ -121,4 +121,59 @@ fn test_cancel_split_success() {
 
     let status = client.get_split_status(&bill_id);
     assert_eq!(status.cancelled, true);
+}
+
+#[test]
+fn test_add_participant_success() {
+    let env = Env::default();
+    env.mock_all_auths();
+
+    let contract_id = env.register(SplitBillRegistry, ());
+    let client = SplitBillRegistryClient::new(&env, &contract_id);
+
+    let notifier_id = Address::generate(&env);
+    let bill_id = String::from_str(&env, "bill-5");
+    let total_amount = 5000;
+    let creator = Address::generate(&env);
+    let p1 = Address::generate(&env);
+    let participants = vec![&env, p1.clone()];
+
+    client.create_split(&bill_id, &total_amount, &participants, &creator, &notifier_id);
+
+    let p2 = Address::generate(&env);
+    client.add_participant(&bill_id, &p2);
+
+    let status = client.get_split_status(&bill_id);
+    assert_eq!(status.participants.len(), 2);
+    assert_eq!(status.participants.get(1).unwrap().address, p2);
+}
+
+#[test]
+#[should_panic(expected = "HostError: Error(Auth, InvalidAction)")]
+fn test_unauthorized_add_participant() {
+    let env = Env::default();
+    let contract_id = env.register(SplitBillRegistry, ());
+    let client = SplitBillRegistryClient::new(&env, &contract_id);
+
+    let bill_id = String::from_str(&env, "bill-6");
+    let creator = Address::generate(&env);
+    let p1 = Address::generate(&env);
+
+    let bill = SplitBill {
+        total_amount: 6000,
+        participants: vec![&env, ParticipantStatus { address: p1, paid: false }],
+        creator: creator.clone(),
+        notifier: Address::generate(&env),
+        cancelled: false,
+    };
+
+    // Write directly to contract storage in the test
+    env.as_contract(&contract_id, || {
+        let key = DataKey::Split(bill_id.clone());
+        env.storage().persistent().set(&key, &bill);
+    });
+
+    // Call add_participant. Since mock_all_auths is not called, it should panic with auth failure
+    let p2 = Address::generate(&env);
+    client.add_participant(&bill_id, &p2);
 }

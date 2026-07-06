@@ -25,7 +25,7 @@ pub enum DataKey {
 
 #[soroban_sdk::contractclient(name = "SplitNotifierClient")]
 pub trait SplitNotifierInterface {
-    fn notify_completed(env: Env, bill_id: String);
+    fn notify_completed(env: Env, bill_id: String, creator: Address);
     fn is_completed(env: Env, bill_id: String) -> bool;
 }
 
@@ -125,7 +125,7 @@ impl SplitBillRegistry {
 
         if all_paid {
             let notifier_client = SplitNotifierClient::new(&env, &bill.notifier);
-            notifier_client.notify_completed(&bill_id);
+            notifier_client.notify_completed(&bill_id, &bill.creator);
         }
     }
 
@@ -151,6 +151,46 @@ impl SplitBillRegistry {
         env.events().publish(
             (Symbol::new(&env, "split_cancelled"), bill_id),
             (),
+        );
+    }
+
+    pub fn add_participant(env: Env, bill_id: String, participant: Address) {
+        let key = DataKey::Split(bill_id.clone());
+        let mut bill: SplitBill = env
+            .storage()
+            .persistent()
+            .get(&key)
+            .unwrap_or_else(|| panic!("Split bill does not exist"));
+
+        if bill.cancelled {
+            panic!("Split bill is cancelled");
+        }
+
+        // Require creator authority to add a participant
+        bill.creator.require_auth();
+
+        let mut exists = false;
+        for p in bill.participants.iter() {
+            if p.address == participant {
+                exists = true;
+                break;
+            }
+        }
+        if exists {
+            panic!("Participant already exists");
+        }
+
+        bill.participants.push_back(ParticipantStatus {
+            address: participant.clone(),
+            paid: false,
+        });
+
+        env.storage().persistent().set(&key, &bill);
+
+        // Emit participant_added event
+        env.events().publish(
+            (Symbol::new(&env, "participant_added"), bill_id),
+            participant,
         );
     }
 

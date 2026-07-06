@@ -1,5 +1,5 @@
 #![no_std]
-use soroban_sdk::{contract, contractimpl, contracttype, Symbol, Env, String};
+use soroban_sdk::{contract, contractimpl, contracttype, Symbol, Env, String, Address};
 
 #[contracttype]
 pub enum DataKey {
@@ -11,7 +11,8 @@ pub struct SplitNotifier;
 
 #[contractimpl]
 impl SplitNotifier {
-    pub fn notify_completed(env: Env, bill_id: String) {
+    pub fn notify_completed(env: Env, bill_id: String, creator: Address) {
+        creator.require_auth();
         let key = DataKey::Completed(bill_id.clone());
         env.storage().persistent().set(&key, &true);
 
