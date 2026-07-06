@@ -8,6 +8,7 @@ import { TransactionProgress } from './components/TransactionProgress';
 import type { ContractCallStatus, ParticipantSplitStatus } from './components/TransactionProgress';
 import { sendPayment, executeContractCall, getSplitStatusOnChain } from './lib/stellar';
 import { Address, nativeToScVal } from '@stellar/stellar-sdk';
+import { ActivityFeed } from './components/ActivityFeed';
 
 function App() {
   const {
@@ -185,6 +186,13 @@ function App() {
 
   return (
     <>
+      {/* Premium Background - Aurora + Grain */}
+      <div className="aurora-bg">
+        <div className="aurora-circle-1"></div>
+        <div className="aurora-circle-2"></div>
+        <div className="aurora-grain"></div>
+      </div>
+
       <Header
         address={address}
         connect={connect}
@@ -203,31 +211,53 @@ function App() {
         </div>
 
         {showProgress ? (
-          <TransactionProgress
-            billId={billId}
-            createSplit={createSplit}
-            participants={participants}
-            isSending={isSending}
-            onReset={handleReset}
-          />
+          <div className="glowing-wrapper">
+            <div className="glowing-glow"></div>
+            <div className="glowing-content">
+              <TransactionProgress
+                billId={billId}
+                createSplit={createSplit}
+                participants={participants}
+                isSending={isSending}
+                onReset={handleReset}
+              />
+            </div>
+          </div>
         ) : (
           <div className="grid-2">
-            <BalanceCard
-              address={address}
-              balance={balance}
-              loadingBalance={loadingBalance}
-              error={error}
-              refreshBalance={refreshBalance}
-            />
+            <div className="glowing-wrapper">
+              <div className="glowing-glow"></div>
+              <div className="glowing-content">
+                <BalanceCard
+                  address={address}
+                  balance={balance}
+                  loadingBalance={loadingBalance}
+                  error={error}
+                  refreshBalance={refreshBalance}
+                />
+              </div>
+            </div>
 
-            <SplitForm
-              senderAddress={address}
-              senderBalance={balance}
-              onSendPayments={handleSendPayments}
-              isSending={isSending}
-            />
+            <div className="glowing-wrapper">
+              <div className="glowing-glow"></div>
+              <div className="glowing-content">
+                <SplitForm
+                  senderAddress={address}
+                  senderBalance={balance}
+                  onSendPayments={handleSendPayments}
+                  isSending={isSending}
+                />
+              </div>
+            </div>
           </div>
         )}
+
+        <div className="glowing-wrapper" style={{ marginTop: '2rem' }}>
+          <div className="glowing-glow"></div>
+          <div className="glowing-content">
+            <ActivityFeed />
+          </div>
+        </div>
       </main>
 
       <footer className="footer">

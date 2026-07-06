@@ -305,8 +305,7 @@ export const SplitForm: React.FC<SplitFormProps> = ({
           <button
             type="submit"
             disabled={isSending || recipients.length === 0}
-            className="btn btn-primary w-full"
-            style={{ padding: '1rem', fontSize: '1.05rem' }}
+            className="btn-cta"
           >
             {isSending ? (
               <>
