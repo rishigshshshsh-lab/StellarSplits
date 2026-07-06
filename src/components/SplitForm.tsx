@@ -161,7 +161,12 @@ export const SplitForm: React.FC<SplitFormProps> = ({
                 className="form-input"
                 placeholder="e.g. 50.0"
                 value={totalAmount}
-                onChange={(e) => setTotalAmount(e.target.value)}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  if (val === '' || /^\d*\.?\d{0,7}$/.test(val)) {
+                    setTotalAmount(val);
+                  }
+                }}
                 disabled={isSending || !senderAddress}
               />
             </div>
