@@ -13,6 +13,9 @@ pub struct ParticipantStatus {
 pub struct SplitBill {
     pub total_amount: u64,
     pub participants: Vec<ParticipantStatus>,
+    pub creator: Address,
+    pub notifier: Address,
+    pub cancelled: bool,
 }
 
 #[contracttype]
@@ -20,12 +23,27 @@ pub enum DataKey {
     Split(String),
 }
 
+#[soroban_sdk::contractclient(name = "SplitNotifierClient")]
+pub trait SplitNotifierInterface {
+    fn notify_completed(env: Env, bill_id: String);
+    fn is_completed(env: Env, bill_id: String) -> bool;
+}
+
 #[contract]
 pub struct SplitBillRegistry;
 
 #[contractimpl]
 impl SplitBillRegistry {
-    pub fn create_split(env: Env, bill_id: String, total_amount: u64, participants: Vec<Address>) {
+    pub fn create_split(
+        env: Env,
+        bill_id: String,
+        total_amount: u64,
+        participants: Vec<Address>,
+        creator: Address,
+        notifier: Address,
+    ) {
+        creator.require_auth();
+
         let key = DataKey::Split(bill_id.clone());
         if env.storage().persistent().has(&key) {
             panic!("Split bill already exists");
@@ -42,6 +60,9 @@ impl SplitBillRegistry {
         let bill = SplitBill {
             total_amount,
             participants: participant_statuses,
+            creator: creator.clone(),
+            notifier,
+            cancelled: false,
         };
 
         env.storage().persistent().set(&key, &bill);
@@ -49,7 +70,7 @@ impl SplitBillRegistry {
         // Emit split_created event
         env.events().publish(
             (Symbol::new(&env, "split_created"), bill_id),
-            total_amount,
+            (creator, total_amount),
         );
     }
 
@@ -60,6 +81,13 @@ impl SplitBillRegistry {
             .persistent()
             .get(&key)
             .unwrap_or_else(|| panic!("Split bill does not exist"));
+
+        if bill.cancelled {
+            panic!("Split bill is cancelled");
+        }
+
+        // Require auth of the creator of the bill
+        bill.creator.require_auth();
 
         let mut found = false;
         let mut updated_participants = Vec::new(&env);
@@ -82,8 +110,47 @@ impl SplitBillRegistry {
 
         // Emit payment_marked event
         env.events().publish(
-            (Symbol::new(&env, "payment_marked"), bill_id),
+            (Symbol::new(&env, "payment_marked"), bill_id.clone()),
             participant_address.clone(),
+        );
+
+        // Check if all paid
+        let mut all_paid = true;
+        for p in bill.participants.iter() {
+            if !p.paid {
+                all_paid = false;
+                break;
+            }
+        }
+
+        if all_paid {
+            let notifier_client = SplitNotifierClient::new(&env, &bill.notifier);
+            notifier_client.notify_completed(&bill_id);
+        }
+    }
+
+    pub fn cancel_split(env: Env, bill_id: String) {
+        let key = DataKey::Split(bill_id.clone());
+        let mut bill: SplitBill = env
+            .storage()
+            .persistent()
+            .get(&key)
+            .unwrap_or_else(|| panic!("Split bill does not exist"));
+
+        // Require creator authority to cancel
+        bill.creator.require_auth();
+
+        if bill.cancelled {
+            panic!("Split bill is already cancelled");
+        }
+
+        bill.cancelled = true;
+        env.storage().persistent().set(&key, &bill);
+
+        // Emit split_cancelled event
+        env.events().publish(
+            (Symbol::new(&env, "split_cancelled"), bill_id),
+            (),
         );
     }
 
