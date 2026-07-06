@@ -77,6 +77,9 @@ The Soroban smart contract is deployed on Testnet at:
 2. `mark_paid(bill_id: String, participant: Address)`
 3. `get_split_status(bill_id: String) -> Option<SplitStatus>`
 
+### Verifiable Contract Call:
+- **Transaction Hash**: [`021f2b311a843b58c17fcc9cda322437403aec303eace1d4d3a7417bdea313ba`](https://stellar.expert/explorer/testnet/tx/021f2b311a843b58c17fcc9cda322437403aec303eace1d4d3a7417bdea313ba)
+
 ---
 
 ## 📸 Screenshots & Explorations
