@@ -279,6 +279,12 @@ export const SplitForm: React.FC<SplitFormProps> = ({
             <span style={{ color: 'var(--text-secondary)' }}>Number of Recipients:</span>
             <span style={{ fontWeight: 700, color: 'white' }}>{recipients.length}</span>
           </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem', fontSize: '0.9rem' }}>
+            <span style={{ color: 'var(--text-secondary)' }}>Est. Network Fee:</span>
+            <span style={{ fontWeight: 700, color: 'var(--text-muted)' }}>
+              ~{(0.00001 * recipients.length).toFixed(5)} XLM ({recipients.length} tx)
+            </span>
+          </div>
           {includeSender && (
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem', fontSize: '0.9rem' }}>
               <span style={{ color: 'var(--text-secondary)' }}>Sender's Share (Kept):</span>
