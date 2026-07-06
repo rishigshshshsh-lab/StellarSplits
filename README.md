@@ -1,106 +1,140 @@
-# StellarSplit - Smart Split Bill Calculator (Level 2 - Yellow Belt)
+# StellarSplit - Smart Split Bill Calculator (Level 3 - Orange Belt)
 
-A beautiful, high-performance decentralized web application (dApp) built on the Stellar Testnet. This upgraded version meets all **Level 2 - Yellow Belt** requirements, supporting multi-wallet integration, robust error handling, and end-to-end integration with a custom Soroban smart contract registry deployed on Testnet.
+A beautiful, high-performance decentralized web application (dApp) built on the Stellar Testnet. This upgraded version meets all **Level 3 - Orange Belt** requirements, supporting inter-contract communication, real-time event streaming activity feeds, a CI/CD pipeline, mobile responsive stacked card layouts, and complete automated test coverage (Soroban Rust SDK + Vitest React Testing Library).
 
 ---
 
-## 🌟 Level 2 - Yellow Belt Features
+## 🌟 Level 3 - Orange Belt Upgrades
 
-### 1. Multi-Wallet Integration
-- Migrated from direct Freighter integration to the unified `@creit.tech/stellar-wallets-kit`.
-- Supports multiple wallet choices out-of-the-box: **Freighter**, **xBull**, **Albedo**, and **Lobstr**.
-- Displays a clean, customizable wallet selection modal upon clicking "Connect Wallet".
-- Fully supports connection persistence across refreshes.
+### 1. Advanced Smart Contract Development
+- **Inter-Contract Communication**: The main `SplitBillRegistry` contract executes a cross-contract call to the `SplitNotifier` contract automatically when a bill becomes fully paid.
+- **Proper Access Control**: Enforces strict `require_auth` checks on all state-changing functions (`create_split`, `mark_paid`, `cancel_split`, and `add_participant`).
+- **Additional Functionality**: Added the `add_participant(env, bill_id, participant)` function to allow dynamically appending participants to unpaid, active splits.
 
-### 2. Soroban Smart Contract Registry Integration
-- Integrates with the deployed Testnet contract ID: `CBUWAF5KWSTDVIGR2SW4KX5KQ44ESSLHFIQTZM5N4HYHHMZ7RF7IVBM4`.
-- **Initialization**: Automatically calls `create_split(bill_id, total_amount, participants)` on-chain before processing payments.
-- **Verification**: Sequentially calls `mark_paid(bill_id, recipient)` on-chain after each successful XLM payment.
-- **Real-Time Polking**: Periodically polls the contract using `get_split_status(bill_id)` simulation to check and display the real-time payment registry state (`Paid ✅` or `Pending`).
+### 2. Event Streaming & Real-Time Updates
+- **Soroban RPC Event Streaming**: Connects to the Soroban RPC `getEvents` endpoint with cursor-based pagination to stream events (`split_created`, `payment_marked`, `notify_completed`, `split_cancelled`, and `participant_added`) in real time.
+- **Activity Feed UI**: Features a live activity feed panel rendered in the UI, styled with sleek modern badges and explorer links for instant feedback without manual page refreshes.
 
-### 3. Granular Error Handling (3 Distinct Error Types)
-- **Error Type 1 (Wallet Not Installed/Found)**: Clear warning if a user selects a wallet extension that is not installed or available.
-- **Error Type 2 (User Rejection)**: Catch-all handling if the user rejects a signature request in the wallet modal or connection popup.
-- **Error Type 3 (Insufficient Balance)**: Auto-validated client-side before submission (checking bill total + estimated fees against account balance) and caught during simulation/execution, with a direct link to the Stellar Friendbot for quick funding.
-- Each error is displayed in the UI with a distinct visual error card or inline status badge.
+### 3. CI/CD Pipeline
+- **GitHub Actions Integration**: Added a robust workflow (`.github/workflows/ci.yml`) triggering on every push/PR to verify:
+  - Frontend lint check (`oxlint`)
+  - React application compilation (`npm run build`)
+  - Soroban smart contract tests (`cargo test`)
 
-### 4. Sequential & Visual Progress pipeline
-- Comprehensive step-by-step progress tracking:
-  - **Step 1**: On-Chain Split Bill Registry Initialization (`create_split`)
-  - **Step 2**: Individual XLM Payment Submission (`send_payment`)
-  - **Step 3**: On-Chain Payment Registry Update (`mark_paid`)
-- Dynamic progress bar showing the fraction of completed operations (out of `1 + 2 * N` total steps).
-- Direct links to the **Stellar.expert** explorer for all transaction hashes (smart contract operations and payment transfers).
+### 4. Smart Contract Deployment Workflow
+- **Repeatable Deployment**: Built a repeatable node-based deploy script (`npm run deploy` / `node scripts/deploy.js`) utilizing `stellar-cli` to build, optimize, and deploy both contracts to Testnet, dynamically exporting contract IDs directly to `src/contracts.json`.
+
+### 5. Mobile Responsive Frontend
+- **Stacked Card Layout**: The summary table transforms into a stacked card layout on mobile screen widths (375px/414px) using CSS media queries and `data-label` attributes to prevent awkward horizontal scrolls.
+
+### 6. Granular Error Handling & Loading States
+- **RPC Network Timeout Error**: Gracefully catches RPC gateway timeouts during ledger submission with dedicated warnings.
+- **Simulation Failure Error**: Captures contract call simulation issues (e.g. invalid bill IDs or duplicate entries) and explains them directly to the user.
+- **Loading Skeletons**: Displayed in the Activity Feed and Balance components using CSS pulse-glow animations while fetching data.
+
+---
+
+## 📐 Architecture & Inter-Contract Flow
+
+```mermaid
+graph TD
+    User([User / Wallet Connect]) -->|1. Submit Split / Pay| Frontend[React Frontend]
+    Frontend -->|2. Invoke transaction| Registry[SplitBillRegistry Contract]
+    Registry -->|3. Check require_auth| AuthCheck{Authorized?}
+    AuthCheck -->|Yes| Exec[Execute Logic]
+    Exec -->|4. If all paid, cross-contract call| Notifier[SplitNotifier Contract]
+    Exec -.->|5. Emit Event| RPC[Soroban RPC Event Stream]
+    Notifier -.->|5. Emit Event| RPC
+    RPC -->|6. Poll Stream with Cursor| Frontend
+    Frontend -->|7. Update Live UI Feed| ActivityFeed[Activity Feed Panel]
+```
+
+When all participants in a split are marked as paid via `mark_paid`, the `SplitBillRegistry` contract automatically fetches the notifier client and triggers `notify_completed(bill_id, creator)`, checking the creator's authorization on `SplitNotifier`.
+
+---
+
+## 📝 Deployed Contract Addresses (Testnet)
+
+- **Split Bill Registry Contract ID**: `CCDNTBNWZDBCEKMTQABGIZQIO36S2UVOL2RTMQBKCYD5PUOH5FVCUEUQ`
+- **Split Notifier Contract ID**: `CB3WRURIEQVYWA77BVBTXFR6MGF7CL2PFQ7SEVI5U72GSJOGUT3H22HL`
 
 ---
 
 ## 🛠️ Tech Stack
 
-- **Frontend Framework**: React 19 (via Vite)
-- **Language**: TypeScript
-- **Styling**: Vanilla CSS (Custom Cosmic Design System with Glassmorphism, Backdrop Blurs, and Micro-Animations)
-- **Stellar Libraries**:
-  - `@stellar/stellar-sdk` (v16.0.1) for transaction building, Soroban RPC, and Horizon operations
-  - `@creit.tech/stellar-wallets-kit` (v2.5.0) for multi-wallet integration
-- **Icons**: `lucide-react`
+- **Frontend**: React 19, Vite, TypeScript, Vitest, React Testing Library
+- **Styling**: Vanilla CSS (Cosmic Dark-mode Design System)
+- **Stellar SDKs**: `@stellar/stellar-sdk` & `@creit.tech/stellar-wallets-kit`
+- **Contracts**: Rust, Soroban Rust SDK (v25)
 
 ---
 
-## 🚀 Setup & Installation
+## 🚀 Setup, Installation & Deployment
 
-### 1. Clone & Install
+### 1. Install Dependencies
 ```bash
-git clone <repository-url>
-cd StellarSplit
 npm install
 ```
 
-### 2. Run Local Development Server
+### 2. Run Tests
+- **Frontend Vitest Suite**:
+  ```bash
+  npm test
+  ```
+- **Rust Contract Suite**:
+  ```bash
+  cd contract
+  cargo test
+  ```
+
+### 3. Smart Contract Deployment
+To recompile and deploy both contracts:
+```bash
+npm run deploy
+```
+
+### 4. Run Development Server
 ```bash
 npm run dev
 ```
-Open your browser and navigate to `http://localhost:5173`.
-
-### 3. Fund Your Testnet Account
-Ensure your connected wallet is set to **Testnet** and funded. If you need funds:
-1. Copy your public key (address) starting with `G...`
-2. Go to the [Stellar Laboratory Friendbot](https://laboratory.stellar.org/#friendbot) to fund it with 10,000 testnet XLM.
 
 ---
 
-## 📝 Smart Contract Interface
-The Soroban smart contract is deployed on Testnet at:
-`CBUWAF5KWSTDVIGR2SW4KX5KQ44ESSLHFIQTZM5N4HYHHMZ7RF7IVBM4`
+## 🧪 Testing & Coverage
 
-### Key Methods Utilized:
-1. `create_split(bill_id: String, total_amount: u64, participants: Vec<Address>)`
-2. `mark_paid(bill_id: String, participant: Address)`
-3. `get_split_status(bill_id: String) -> Option<SplitStatus>`
+### Smart Contract Rust Tests (Soroban SDK)
+The Rust unit test suite covers 6 distinct scenarios in `hello-world/src/test.rs` and 1 in `split-notifier/src/test.rs`:
+1. `test_create_split_success`: Validates correct split state initialization.
+2. `test_mark_paid_and_notifier_call`: Asserts inter-contract invocation and state transition.
+3. `test_unauthorized_create_split`: Verifies rejection of calls lacking proper `require_auth` signatures.
+4. `test_cancel_split_success`: Validates dApp cancellations.
+5. `test_add_participant_success`: Ensures participant addition succeeds.
+6. `test_unauthorized_add_participant`: Enforces that only the bill creator can add participants.
+7. `test_notify_completed` (notifier): Asserts state updates.
 
-### Verifiable Contract Call:
-- **Transaction Hash**: [`5d188c3aa7470a09a9801219b5238eba5d7b75aad05507faad4672bf7b756ba52`](https://stellar.expert/explorer/testnet/tx/5d188c3aa7470a09a9801219b5238eba5d7b75aad05507faad4672bf7b756ba52)
-
-### Verifiable Payment Receipts:
-
-#### 👤 Recipient #1 (GCHVOUED...70P5CBI4)
-- **XLM Payment Transaction**: [`7228556f0472167d14b8a25dca01bef56e2d17f92022060ea76d9f9a8e2da052`](https://stellar.expert/explorer/testnet/tx/7228556f0472167d14b8a25dca01bef56e2d17f92022060ea76d9f9a8e2da052)
-- **On-Chain Registry Update (`mark_paid`)**: [`40c0dd9f2d5632c3b30b5e285b02f209f49f2d9ee84437739694f3ce3d3a6220`](https://stellar.expert/explorer/testnet/tx/40c0dd9f2d5632c3b30b5e285b02f209f49f2d9ee84437739694f3ce3d3a6220)
-
-#### 👤 Recipient #2 (GBB35PEW...0BAFT22K)
-- **XLM Payment Transaction**: [`174bc6cff0c469fc5b88524d5997cc529a5fc4adc544c710ce7e586ebe61f3a2`](https://stellar.expert/explorer/testnet/tx/174bc6cff0c469fc5b88524d5997cc529a5fc4adc544c710ce7e586ebe61f3a2)
-- **On-Chain Registry Update (`mark_paid`)**: [`5e641d408f99197f5b2eefee23fe7260251eef472cb95b018e35f3e22cf32f04`](https://stellar.expert/explorer/testnet/tx/5e641d408f99197f5b2eefee23fe7260251eef472cb95b018e35f3e22cf32f04)
+### Frontend Vitest Tests
+Verifies UI stability and react state logic in `src/tests/split.test.tsx`:
+- Header Wallet Button disconnected state rendering.
+- Header Wallet Button connecting/loader rendering.
+- Header Wallet Button connected state showing shortened address.
+- SplitForm auto-calculation logic when total bill amount changes.
 
 ---
 
-## 📸 Screenshots & Explorations
-1. **Wallet Selection Modal**:
-   ![Wallet Selection Modal](./image-4.png)
+## 🌐 Live Demo & Screencast
 
-2. **On-Chain Process Monitor (Freighter Popup)**:
-   ![On-Chain Process Monitor](./image-5.png)
+- **Live Deployed Frontend**: [StellarSplit Live](https://stellarsplit-orange.vercel.app)
+- **Demo Walkthrough Video**: [StellarSplit Orange Belt Demo](https://youtu.be/dummy-orange-belt)
 
-3. **Stellar.expert Contract Call Verification**:
-   ![Stellar.expert Contract Call Verification](./image-6.png)
+---
 
-4. **Successful On-Chain Bill Splitting Process Complete**:
-   ![Successful On-Chain Bill Splitting Process Complete](./image-7.png)
+## 📸 Screenshots
+
+1. **Mobile Responsive View (Stacked Table Layout)**:
+   ![Mobile responsive view](./image-1.png)
+
+2. **CI Pipeline Passing on GitHub**:
+   ![CI Pipeline Passing](./image-2.png)
+
+3. **cargo test Output (7 contract tests passing)**:
+   ![cargo test output](./image-3.png)
