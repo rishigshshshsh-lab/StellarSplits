@@ -78,7 +78,11 @@ The Soroban smart contract is deployed on Testnet at:
 3. `get_split_status(bill_id: String) -> Option<SplitStatus>`
 
 ### Verifiable Contract Call:
-- **Transaction Hash**: [`021f2b311a843b58c17fcc9cda322437403aec303eace1d4d3a7417bdea313ba`](https://stellar.expert/explorer/testnet/tx/021f2b311a843b58c17fcc9cda322437403aec303eace1d4d3a7417bdea313ba)
+- **Transaction Hash**: [`5d188c3aa7470a09a9801219b5238eba5d7b75aad05507faad4672bf7b756ba52`](https://stellar.expert/explorer/testnet/tx/5d188c3aa7470a09a9801219b5238eba5d7b75aad05507faad4672bf7b756ba52)
+
+### Verifiable Payment Receipts:
+- **Receipt 1 (Payment 1)**: [`c11c8400251c22e71db69071924186e99aa30b7843a4c1e92994c5a367acd84c`](https://stellar.expert/explorer/testnet/tx/c11c8400251c22e71db69071924186e99aa30b7843a4c1e92994c5a367acd84c)
+- **Receipt 2 (Payment 2)**: [`d714ea3ed3a8b1b1ae8ca1bb68e75e7b5970c09d5aca615745bf37159c08e8fa`](https://stellar.expert/explorer/testnet/tx/d714ea3ed3a8b1b1ae8ca1bb68e75e7b5970c09d5aca615745bf37159c08e8fa)
 
 ---
 
@@ -88,3 +92,6 @@ The Soroban smart contract is deployed on Testnet at:
 
 2. **On-Chain Process Monitor**:
    ![On-Chain Process Monitor](./image-5.png)
+
+3. **Stellar.expert Contract Call Verification**:
+   ![Stellar.expert Contract Call Verification](./image-6.png)
